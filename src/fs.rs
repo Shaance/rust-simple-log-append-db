@@ -36,7 +36,7 @@ impl FSHelper for LogFSHelper {
 
     fn create_file_if_not_exists(&self, file_path: &str) {
         if !std::path::Path::new(file_path).exists() {
-            fs::File::create(file_path).expect("Unable to create file");
+            fs::File::create(file_path).expect(format!("Failed to create file {}", file_path).as_str());
         }
     }
 
@@ -46,9 +46,9 @@ impl FSHelper for LogFSHelper {
             .append(true)
             .create(true)
             .open(log_file_path)
-            .expect("Unable to open file");
+            .expect(format!("Failed to open file {}", log_file_path).as_str());
         let bytes = data.as_bytes();
-        file.write_all(bytes).expect("Unable to write");
+        file.write_all(bytes).expect(format!("Failed to write to file {}", log_file_path).as_str());
         bytes.len()
     }
 
@@ -58,13 +58,13 @@ impl FSHelper for LogFSHelper {
 
     fn delete_file(&self, file_path: &str) {
         if std::path::Path::new(file_path).exists() {
-            fs::remove_file(file_path).expect("Unable to delete file");
+            fs::remove_file(file_path).expect(format!("Unable to delete file {}", file_path).as_str());
         }
     }
 
     fn rename_file(&self, old_file_path: &str, new_file_path: &str) {
         if std::path::Path::new(old_file_path).exists() {
-            fs::rename(old_file_path, new_file_path).expect("Unable to rename file");
+            fs::rename(old_file_path, new_file_path).expect(format!("Unable to rename file {} to {}", old_file_path, new_file_path).as_str());
         }
     }
 }
@@ -88,16 +88,16 @@ impl LogFSHelper {
     }
 
     fn read_from_file(&self, file_path: &str, position: u64, bytes_to_read: usize) -> String {
-        let mut file = fs::File::open(file_path).expect("Unable to open file");
+        let mut file = fs::File::open(file_path).expect(format!("Unable to open file {}", file_path).as_str());
         file.seek(SeekFrom::Start(position))
-            .expect("Unable to seek");
+            .expect(format!("Unable to seek to position {}", position).as_str());
         let mut buffer = vec![0u8; bytes_to_read];
-        file.read_exact(&mut buffer).expect("Unable to read");
+        file.read_exact(&mut buffer).expect(format!("Unable to read {} bytes from file {}", bytes_to_read, file_path).as_str());
         String::from_utf8_lossy(&buffer).to_string()
     }
 
     fn get_file_size(&self, file_path: &str) -> u64 {
-        let metadata = fs::metadata(file_path).expect("Unable to get file metadata");
+        let metadata = fs::metadata(file_path).expect(format!("Unable to get metadata for file {}", file_path).as_str());
         metadata.len()
     }
 }
