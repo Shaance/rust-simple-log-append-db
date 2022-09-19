@@ -1,6 +1,8 @@
 use rand::Rng;
 use simple_db::db::{Database, SimpleDB};
 use simple_db::fs::LogFSHelper;
+use env_logger::Env;
+use log::info;
 
 fn random_string(list: &Vec<&str>) -> String {
     let mut rng = rand::thread_rng();
@@ -30,7 +32,7 @@ fn some_random_usage_of_db() {
         db.get(&random_string(&keys));
 
         if i != 0 && i % 50_000 == 0 {
-            println!(
+            info!(
                 "Set {} random key value pairs in {} iterations",
                 set_count, i
             );
@@ -44,12 +46,17 @@ fn some_random_usage_of_db() {
             delete_count += 1;
         }
     }
-    println!();
-    println!("Total set count: {}", set_count);
-    println!("Total delete count: {}", delete_count);
-    println!("Total get count: {}", TOTAL_ITERATIONS);
+    info!("Total set count: {}", set_count);
+    info!("Total delete count: {}", delete_count);
+    info!("Total get count: {}", TOTAL_ITERATIONS);
+}
+
+fn init_logger() {
+    // default log level is error, this overrides it to info if RUST_LOG is not set
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 }
 
 fn main() {
+    init_logger();
     some_random_usage_of_db()
 }

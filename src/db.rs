@@ -1,4 +1,5 @@
 use crate::fs::FSHelper;
+use log::info;
 
 pub struct SimpleDB {
     index: std::collections::HashMap<String, IndexValue>,
@@ -60,7 +61,7 @@ impl SimpleDB {
 
     fn run_compaction(&mut self) {
         // this is not thread-safe but this program is not multi-threaded anyway
-        println!(
+        info!(
             "Log file size before compaction: {} bytes",
             self.fs_helper.get_log_file_size()
         );
@@ -99,7 +100,7 @@ impl SimpleDB {
 
         self.fs_helper.delete_file(OLD_LOG_FILE_PATH);
         self.fs_helper.delete_file(TMP_NEW_LOG_FILE_PATH);
-        println!(
+        info!(
             "Log file size after compaction: {} bytes",
             self.fs_helper.get_log_file_size()
         );
